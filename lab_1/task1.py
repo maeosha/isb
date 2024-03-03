@@ -21,3 +21,17 @@ def adding_letters(text: str, key: list) -> str:
         text += random_letter
 
     return text
+
+def encrypting_text(text: str, key: list) -> str:
+    """Encrypt the text using the route permutation method"""
+    encryption_matrix: list = list()
+    encrypted_text: str = ""
+
+    for index in range(0, len(text), len(key)):
+        encryption_matrix.append(text[index:len(key) + index])
+
+    for index in key:
+        for row in encryption_matrix:
+            encrypted_text += row[index]
+
+    return encrypted_text
