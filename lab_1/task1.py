@@ -35,3 +35,11 @@ def encrypting_text(text: str, key: list) -> str:
             encrypted_text += row[index]
 
     return encrypted_text
+
+def start_to_encrypt(key_word: str, text: str) -> None:
+    key_word: list = list(map(ord, key_word))
+    text: str = text.replace(" ", "")
+
+    key: list = creating_key(key_word)
+    text = adding_letters(text, key)
+    logging.info(encrypting_text(text, key))
