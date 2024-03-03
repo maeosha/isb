@@ -13,3 +13,11 @@ def creating_key(key_word: list) -> list:
         key_word[min_elem_index] = 1000
 
     return key
+
+def adding_letters(text: str, key: list) -> str:
+    """Complete the text to the full distribution by key, for further encoding"""
+    while len(text) % len(key) != 0:
+        random_letter = choice(ascii_letters)
+        text += random_letter
+
+    return text
