@@ -34,3 +34,21 @@ def get_stats(encrypted_text: str) -> tuple:
 
     return ave_stats, item
 
+def write_to_file(encrypted_text: str, ave_stats: str, item: list) -> None:
+    """Write the decrypted text and the encryption key to the file"""
+    with open(os.path.join("decrypted_file.txt"), "w", encoding='utf-8') as file:
+        file.write("Decrypted text: \n")
+        file.write(encrypted_text)
+
+    with open(os.path.join("key.txt"), "w", encoding='utf-8') as file:
+        file.write("Key: \n")
+        for i in range(len(ave_stats)):
+            file.write(ave_stats[i] + " - " + item[i][0] + "\n")
+
+def start_decrypt() -> None:
+    encrypted_text: str = read_from_file()
+    ave_stats, item = get_stats(encrypted_text)
+    write_to_file(encrypted_text, ave_stats, item)
+
+if __name__ == "__main__":
+    start_decrypt()
