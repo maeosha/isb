@@ -1,54 +1,66 @@
 import os
+import logging
 
-def read_from_file() -> str:
+def read_from_text_file(path_to_text_file: str) -> str:
     """Read encrypted text from a file"""
     encrypted_text: str = ""
-    with open(os.path.join("encrypted_file.txt"), "r") as file:
-        for i in file:
-            encrypted_text += i.replace('\n', '')
+    try:
+        with open(os.path.join(path_to_text_file), "r") as file:
+            for i in file:
+                encrypted_text += i.replace('\n', '')
+    except:
+        logging.warning(f"The file {path_to_text_file} is not exist!", NameError)
 
     return encrypted_text
 
-def get_stats(encrypted_text: str) -> tuple:
+def read_from_key_file(path_to_key_file: str) -> str:
+    key: str = ""
+    try:
+        with open(os.path.join(path_to_key_file), "r", encoding='utf-8') as file:
+            file.__next__()
+            while True:
+                line: str = file.readline()
+
+                if not line:
+                    break
+
+                key += line[0]
+    except:
+        logging.warning(f"The file {path_to_key_file} is not exist!", NameError)
+    return key
+
+
+def get_stats(encrypted_text: str, key: str) -> str:
     """Calculating the percentage of letters meeting and decoding the text"""
     stats: dict = dict()
-    ave_stats: str = " оаинетслвпкурдябмьызюйгщэчжъфщхц"
 
-    for letter in encrypted_text:
-        if letter in stats:
-            stats[letter] += 1
-        else:
-            stats[letter] = 1
+    for letter in set(encrypted_text):
+        stats[letter] = encrypted_text.count(letter)
 
     for stat in stats:
         stats[stat] = stats[stat] / len(encrypted_text)
 
     stats = dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
     keys = list(stats.keys())
-    item = list(stats.items())
     i = 0
 
-    for stat in ave_stats:
+    for stat in key:
         encrypted_text = encrypted_text.replace(keys[i], stat)
         i += 1
 
-    return ave_stats, item
+    return encrypted_text
 
-def write_to_file(encrypted_text: str, ave_stats: str, item: list) -> None:
+def write_to_file(decrypted_text: str, path_to_decrypted_file: str) -> None:
     """Write the decrypted text and the encryption key to the file"""
-    with open(os.path.join("decrypted_file.txt"), "w", encoding='utf-8') as file:
+    with open(os.path.join(path_to_decrypted_file), "w", encoding='utf-8') as file:
         file.write("Decrypted text: \n")
-        file.write(encrypted_text)
+        file.write(decrypted_text)
 
-    with open(os.path.join("key.txt"), "w", encoding='utf-8') as file:
-        file.write("Key: \n")
-        for i in range(len(ave_stats)):
-            file.write(ave_stats[i] + " - " + item[i][0] + "\n")
+def start_decrypt(path_to_text_file: str, path_to_key_file: str, path_to_decrypted_file: str) -> None:
+    encrypted_text: str = read_from_text_file(path_to_text_file)
+    key: str = read_from_key_file(path_to_key_file)
+    decrypted_text = get_stats(encrypted_text, key)
 
-def start_decrypt() -> None:
-    encrypted_text: str = read_from_file()
-    ave_stats, item = get_stats(encrypted_text)
-    write_to_file(encrypted_text, ave_stats, item)
+    write_to_file(decrypted_text, path_to_decrypted_file)
 
-if __name__ == "__main__":
-    start_decrypt()
+

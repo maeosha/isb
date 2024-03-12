@@ -1,16 +1,28 @@
+import os
+import logging
+
 from string import ascii_letters
 from random import choice
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
-def creating_key(key_word: list) -> list:
+def read_from_file(path_to_file: str) -> str:
+    try:
+        with open(os.path.join(path_to_file), "r", encoding='utf-8') as file:
+            info: str = file.readline()
+    except:
+        logging.warning(f"The file {path_to_file} is not exist!", NameError)
+
+    return info
+
+def key_conversion(key_word: list) -> list:
     """Сreate a key from a keyword according to the alphabetical order of letters"""
     key: list = [len(key_word)] * len(key_word)
+    tmp_big_elem: int = 9999
     for index in range(len(key_word)):
         min_elem_index = key_word.index(min(key_word))
-        key[min_elem_index] = 0 + index
-        key_word[min_elem_index] = 1000
+        key[min_elem_index] = index
+        key_word[min_elem_index] = tmp_big_elem
 
     return key
 
@@ -36,10 +48,10 @@ def encrypting_text(text: str, key: list) -> str:
 
     return encrypted_text
 
-def start_to_encrypt(key_word: str, text: str) -> None:
-    key_word: list = list(map(ord, key_word))
-    text: str = text.replace(" ", "")
+def start_to_encrypt(path_to_text_file: str, path_to_key_file: str) -> None:
+    key_word: list = list(map(ord, read_from_file(path_to_key_file)))
+    text: str = read_from_file(path_to_text_file)
 
-    key: list = creating_key(key_word)
+    key: list = key_conversion(key_word)
     text = adding_letters(text, key)
     logging.info(encrypting_text(text, key))

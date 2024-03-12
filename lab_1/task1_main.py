@@ -1,16 +1,17 @@
 import argparse
-from encrypting_text import start_to_encrypt
+from task1 import start_to_encrypt
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--keyword',
+parser.add_argument('--path_to_text_file',
                     type=str,
-                    default="abcdMaxim",
-                    help='Enter the keyword.(default: abcdMaxim')
+                    default="text_task1",
+                    help='Enter the path to the encrypted text file.(default: text_task1.txt')
 
-parser.add_argument('text',
+parser.add_argument('--path_to_key_file',
                     type=str,
-                    help='Enter the text to encrypt.')
+                    default='key_task1.txt',
+                    help='Enter the path to the key file.(default: key_task1.txt')
 
 if __name__ == "__main__":
     my_variables = parser.parse_args()
