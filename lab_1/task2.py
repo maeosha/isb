@@ -1,29 +1,4 @@
-import json
-import os
-import logging
-
-def read_from_text_file(path_to_file: str) -> str:
-    """Read encrypted text from a file"""
-    encrypted_text: str = ""
-    try:
-        with open(os.path.join(path_to_file), "r") as file:
-            encrypted_text = json.load(file)["encrypted_text"]
-    except FileExistsError:
-        logging.warning(f"The file {path_to_file} is not exist!", NameError)
-
-    return encrypted_text.replace("\n", "")
-
-def read_from_key_file(path_to_file: str) -> list:
-    """"""
-    try:
-        with open(os.path.join(path_to_file), "r", encoding='utf-8') as file:
-            key = [i[7] for i in json.load(file)["key"].split(", ")]
-
-    except FileExistsError:
-        logging.warning(f"The file {path_to_file} is not exist!", NameError)
-    return key
-
-
+from file_work import read_from_text_file_task2, read_from_key_file_task2, write_to_file
 def get_stats(encrypted_text: str, key: list) -> str:
     """Calculating the percentage of letters meeting and decoding the text"""
 
@@ -48,31 +23,15 @@ def get_stats(encrypted_text: str, key: list) -> str:
     keys = list(stats.keys())
     i = 0
 
-    for stat in key:
-        encrypted_text = encrypted_text.replace(keys[i], stat)
-        i += 1
+    for symbol, letter in zip(keys, key):
+        encrypted_text = encrypted_text.replace(symbol, letter)
 
     return encrypted_text
 
-
-
-def write_to_file(decrypted_text: str, path_to_decrypted_file: str) -> None:
-    """Write the decrypted text and the encryption key to the file"""
-    try:
-        if os.path.exists(os.path.join(path_to_decrypted_file)):
-            with open(os.path.join(path_to_decrypted_file), "w", encoding='utf-8') as file:
-                file.write("Decrypted text: \n")
-                file.write(decrypted_text)
-        else:
-            raise FileExistsError(f"The file {path_to_decrypted_file} is not exist!")
-    except FileExistsError as error:
-        logging.warning(error, NameError)
-
-
-
-def start_decrypt(path_to_file: str, path_to_decrypted_file: str) -> None:
-    encrypted_text: str = read_from_text_file(path_to_file)
-    key: list = read_from_key_file(path_to_file)
+def start_decrypt(path_to_key_file: str, path_to_text_file: str, path_to_decrypted_file: str) -> None:
+    """the start of the program, the input gets the path to work with files"""
+    encrypted_text: str = read_from_text_file_task2(path_to_text_file)
+    key: list = read_from_key_file_task2(path_to_key_file)
 
     decrypted_text = get_stats(encrypted_text, key)
 

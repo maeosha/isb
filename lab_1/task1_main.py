@@ -3,9 +3,14 @@ from task1 import start_to_encrypt
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument('--path_to_key_file',
+                    type=str,
+                    default="task1_key.json",
+                    help='Enter the path to the encrypted text file.(default: task1.json')
+
 parser.add_argument('--path_to_text_file',
                     type=str,
-                    default="task1.json",
+                    default="task1_text.json",
                     help='Enter the path to the encrypted text file.(default: task1.json')
 
 parser.add_argument('--path_to_decrypt',
