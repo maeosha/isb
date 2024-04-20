@@ -1,4 +1,6 @@
 import argparse
+import os
+
 from task2 import start_decrypt
 
 parser = argparse.ArgumentParser()
@@ -10,8 +12,8 @@ parser.add_argument('--path_to_text_file',
 
 parser.add_argument('--path_to_key_file',
                     type=str,
-                    default="task2_key.json",
-                    help='Enter the path to the encrypted text file.(default: task2_key.json')
+                    default="task2_key.txt",
+                    help='Enter the path to the encrypted text file.(default: task2_key.txt')
 
 parser.add_argument('--path_to_decrypted_file',
                     type=str,
@@ -20,4 +22,4 @@ parser.add_argument('--path_to_decrypted_file',
 
 if __name__ == "__main__":
     my_variables = parser.parse_args()
-    start_decrypt(*(vars(my_variables).values()))
+    start_decrypt(*map(os.path.join, (vars(my_variables).values())))

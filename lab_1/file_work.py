@@ -1,52 +1,53 @@
 import json
-import logging
 import os
+import logging
 
 logging.basicConfig(level=logging.INFO)
 
-def read_from_file_task1(path_to_file: str) -> dict:
-    """Reading the key from the file"""
+def read_from_key_file(path_to_key_file: str) -> str:
+    """
+    Accepts the path to the file and returns the key.
+    :param path_to_key_file:
+    :return:
+    """
     try:
-        with open(os.path.join(path_to_file), "r", encoding='utf-8') as file:
-            info: dict = json.load(file)
-    except FileExistsError or FileNotFoundError:
-        logging.warning(f"The file {path_to_file} is not exist!", NameError)
+        with open(path_to_key_file, "r", encoding='utf-8') as file:
+            key: str = json.load(file)["key"]
+    except OSError:
+        logging.warning(f"The file {path_to_key_file} is not exist!", NameError)
 
-    return info
-
-
-def read_from_text_file_task2(path_to_file: str) -> str:
-    """Read encrypted text from a file"""
-    encrypted_text: str = ""
-    try:
-        with open(os.path.join(path_to_file), "r") as file:
-            encrypted_text = json.load(file)["encrypted_text"]
-    except FileExistsError or FileNotFoundError:
-        logging.warning(f"The file {path_to_file} is not exist!", NameError)
-
-    return encrypted_text.replace("\n", "")
-
-def read_from_key_file_task2(path_to_file: str) -> list:
-    """reading a key from a file, any key position is possible"""
-    try:
-        with open(os.path.join(path_to_file), "r", encoding='utf-8') as file:
-            key = [i[0] for i in json.load(file)["key"].split(", ").replase(" ", "")]
-
-    except FileExistsError or FileNotFoundError:
-        logging.warning(f"The file {path_to_file} is not exist!", NameError)
     return key
 
+def read_from_text_file(path_to_text_file: str):
+    """
+    Accepts the path to the file and returns the text.
+    :param path_to_text_file:
+    :return:
+    """
+    try:
+        with open(path_to_text_file, "r", encoding="utf-8") as file:
+            file.__next__()
+            text = file.read()
+    except OSError:
+        logging.warning(f"The file {path_to_text_file} is not exist!", NameError)
+
+    return text
 
 def write_to_file(path_to_decrypt: str, text: str) -> None:
-    """Writing encrypted text to a file"""
+    """
+    Write the result of the program to a file.
+    :param path_to_decrypt:
+    :param text:
+    :return:
+    """
     try:
         if os.path.exists(os.path.join(path_to_decrypt)):
-            with open(os.path.join(path_to_decrypt), "w", encoding="utf-8") as file:
+            with open(path_to_decrypt, "w", encoding="utf-8") as file:
                 text_dict = dict()
                 text_dict["decrypted_text"] = text
                 file.write(str(text_dict))
 
         else:
             raise FileExistsError(f"The file {path_to_decrypt} is not exist!")
-    except FileExistsError or FileNotFoundError as error:
+    except OSError as error:
         logging.warning(error)
