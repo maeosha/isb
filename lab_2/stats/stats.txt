@@ -1,6 +1,6 @@
 'Frequency bitwise test with c++ sequence': 0.7236736098317631
-'Frequency bitwise test with java sequence': 0.7236736098317631
+'Frequency bitwise test with java sequence': 0.37675911781158217
 'Test for same bits with c++ sequence': 0.8682433961476089
-'Test for same bits with java sequence': 0.8682433961476089
+'Test for same bits with java sequence': 0.41231077464577437
 'Ones sequence test with c++ sequence': 0.6386354214929191
-'Ones sequence test with java sequence': 0.8590244617621512
+'Ones sequence test with java sequence': 0.743808983746551

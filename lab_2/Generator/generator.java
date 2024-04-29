@@ -1,4 +1,4 @@
-package java.util.Random;
+import java.util.Random;
 
 public class Main
 {
