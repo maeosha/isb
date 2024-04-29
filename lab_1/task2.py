@@ -34,7 +34,6 @@ def get_stats(encrypted_text: str, key: list) -> str:
     stats = dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
 
     keys = list(stats.keys())
-    i = 0
 
     for symbol, letter in zip(keys, key):
         encrypted_text = encrypted_text.replace(symbol, letter)
