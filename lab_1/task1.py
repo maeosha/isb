@@ -4,13 +4,13 @@ from random import choice
 from file_work import read_from_key_file, read_from_text_file, write_to_file
 
 
-def key_conversion(key: str) -> list:
+def key_conversion(key: dict) -> list:
     """
     Create a key from a keyword according to the alphabetical order of letters.
     :param key:
     :return key:
     """
-    key = list(map(ord, key))
+    key = list(map(ord, key["key"]))
     conversed_key = [len(key)] * len(key)
     tmp_big_elem: int = max(key) + 1
     for index in range(len(key)):
@@ -63,7 +63,7 @@ def start_to_encrypt(path_to_key_file: str, path_to_text_file: str, path_to_decr
     :param path_to_decrypt:
     :return:
     """
-    key: str = read_from_key_file(path_to_key_file)
+    key: dict = read_from_key_file(path_to_key_file)
     key: list = key_conversion(key)
 
     text: str = read_from_text_file(path_to_text_file)

@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-def read_from_key_file(path_to_key_file: str) -> str:
+def read_from_key_file(path_to_key_file: str) -> dict:
     """
     Accepts the path to the file and returns the key.
     :param path_to_key_file:
@@ -12,7 +12,7 @@ def read_from_key_file(path_to_key_file: str) -> str:
     """
     try:
         with open(path_to_key_file, "r", encoding='utf-8') as file:
-            key: str = json.load(file)["key"]
+            key: dict = json.load(file)
 
     except OSError as error:
         logging.warning(f"The file {path_to_key_file} is not exist!", error)

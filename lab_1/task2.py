@@ -1,13 +1,14 @@
 from file_work import read_from_text_file, read_from_key_file, write_to_file
 
+error_rate: float = 0.01
 
-def key_conversion(key: str):
+def key_conversion(key: dict):
     """
     Processes the key for further use.
     :param key:
     :return key:
     """
-    key = [i[0] for i in key.replace(" ", "").split(", ")]
+    key = [i[0] for i in key["key"].replace(" ", "").split(", ")]
     return key
 
 
@@ -28,10 +29,10 @@ def get_stats(encrypted_text: str, key: list) -> str:
         for j in range(i + 1, len(stats)):
             if list(stats.items())[i][1] == list(stats.items())[j][1]:
                 if ord(list(stats.items())[i][0]) > ord(list(stats.items())[j][0]):
-                    stats[list(stats.items())[j][0]] += 0.01 + count
+                    stats[list(stats.items())[j][0]] += error_rate + count
                 else:
-                    stats[list(stats.items())[i][0]] += 0.01 + count
-                count += 0.01
+                    stats[list(stats.items())[i][0]] += error_rate + count
+                count += error_rate
 
     stats = dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
 
@@ -53,7 +54,7 @@ def start_decrypt(path_to_key_file: str, path_to_text_file: str, path_to_decrypt
     """
     encrypted_text: str = read_from_text_file(path_to_text_file)
 
-    key: str = read_from_key_file(path_to_key_file)
+    key: dict = read_from_key_file(path_to_key_file)
     key: list = key_conversion(key)
 
     decrypted_text = get_stats(encrypted_text, key)
