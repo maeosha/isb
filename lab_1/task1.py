@@ -5,6 +5,7 @@ from random import choice
 
 from file_work import read_from_key_file, read_from_text_file, write_to_file
 
+
 logging.basicConfig(level=logging.INFO)
 
 def key_conversion(key: str) -> list:
@@ -14,14 +15,15 @@ def key_conversion(key: str) -> list:
     :return key:
     """
     key = list(map(ord, key))
-    key = [len(key)] * len(key)
+    conversed_key = [len(key)] * len(key)
     tmp_big_elem: int = max(key) + 1
     for index in range(len(key)):
         min_elem_index = key.index(min(key))
-        key[min_elem_index] = index
+        conversed_key[min_elem_index] = index
         key[min_elem_index] = tmp_big_elem
 
-    return key
+    return conversed_key
+
 
 def adding_letters(text: str, key: list) -> str:
     """
@@ -35,6 +37,7 @@ def adding_letters(text: str, key: list) -> str:
         text += random_letter
 
     return text
+
 
 def encrypting_text(text: str, key: list) -> str:
     """
@@ -55,6 +58,7 @@ def encrypting_text(text: str, key: list) -> str:
 
     return encrypted_text
 
+
 def start_to_encrypt(path_to_key_file: str, path_to_text_file: str, path_to_decrypt: str) -> None:
     """
     The start of the program, the input gets the path to work with files.
@@ -71,3 +75,4 @@ def start_to_encrypt(path_to_key_file: str, path_to_text_file: str, path_to_decr
     text = adding_letters(text, key)
     decrypted_text = encrypting_text(text, key)
     write_to_file(path_to_decrypt, decrypted_text)
+
