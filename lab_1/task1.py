@@ -1,12 +1,8 @@
-import logging
-
 from string import ascii_letters
 from random import choice
 
 from file_work import read_from_key_file, read_from_text_file, write_to_file
 
-
-logging.basicConfig(level=logging.INFO)
 
 def key_conversion(key: str) -> list:
     """

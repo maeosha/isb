@@ -3,7 +3,6 @@ import os
 
 from task1 import start_to_encrypt
 
-
 parser = argparse.ArgumentParser()
 
 

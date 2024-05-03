@@ -3,7 +3,6 @@ import os
 
 from task2 import start_decrypt
 
-
 parser = argparse.ArgumentParser()
 
 
