@@ -1,8 +1,15 @@
 import math
 import mpmath
 
-from constants import PI_0, PI_1, PI_2, PI_3, len_mini_sequence
 from file_work import read_sequence_from_file, write_stats_to_file
+
+PI_0: float = 0.2148
+PI_1: float = 0.3672
+PI_2: float = 0.2305
+PI_3: float = 0.1875
+
+len_mini_sequence: int = 8
+
 
 def frequency_bitwise_test(sequences: dict, path_to_file: str) -> None:
     """
@@ -27,6 +34,7 @@ def frequency_bitwise_test(sequences: dict, path_to_file: str) -> None:
         stats[f"Frequency bitwise test with {sequence_key} sequence"] = P
         
         write_stats_to_file(path_to_file, stats)
+
 
 def test_for_same_bits(sequences: dict, path_to_file: str) -> None:
     """
@@ -62,6 +70,7 @@ def test_for_same_bits(sequences: dict, path_to_file: str) -> None:
 
             write_stats_to_file(path_to_file, stats)
 
+
 def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: int) -> None:
     """
     Obtaining the probability of randomness of the obtained sequence using an ones sequence test.
@@ -76,7 +85,7 @@ def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: in
         P: float = 0
         xi_sqrt: float = 0
         stats: dict = dict()
-        probabilities_pi: list = [[0, PI_0], [0, PI_1], [0, PI_2], [0, PI_3]]
+        probabilities_pi: dict = {PI_0: 0, PI_1: 0, PI_2: 0, PI_3: 0}
 
         for i_index in range(0, len(sequence_value), 8):
             ones_count: int = 0
@@ -92,26 +101,27 @@ def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: in
 
             match max_ones_count:
                 case 0 | 1:
-                    probabilities_pi[0][0] += 1
+                    probabilities_pi[PI_0] += 1
 
                 case 2:
-                    probabilities_pi[1][0] += 1
+                    probabilities_pi[PI_1] += 1
 
                 case 3:
-                    probabilities_pi[2][0] += 1
+                    probabilities_pi[PI_2] += 1
 
                 case _:
-                    probabilities_pi[3][0] += 1
+                    probabilities_pi[PI_3] += 1
 
-        for index in range(len(probabilities_pi)):
-            numerator: float = math.pow(probabilities_pi[index][0] - 16 * probabilities_pi[index][1], 2)
-            denominator: float = 16 * probabilities_pi[index][1]
+        for PI in probabilities_pi.keys():
+            numerator: float = math.pow(probabilities_pi[PI] - 16 * PI, 2)
+            denominator: float = 16 * PI
             xi_sqrt += (numerator / denominator)
 
         P = mpmath.gammainc(1.5, xi_sqrt / 2)
         stats[f"Ones sequence test with {sequence_key} sequence"] = float(P)
 
         write_stats_to_file(path_to_file, stats)
+
 
 def start_work(path_to_sequence_file: str, path_to_stats_file: str) -> None:
     """
