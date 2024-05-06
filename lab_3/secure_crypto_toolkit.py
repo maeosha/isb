@@ -7,7 +7,55 @@ from cryptography.hazmat.primitives import padding
 
 from file_work import *
 
-iv = os.urandom(16)
+size_128_bit = 128
+size_192_bit = 192
+size_256_bit = 256
+byte_size = 8
+public_exponent=65537
+key_size=2048
+
+
+def check_key_length(size_key: int):
+    try:
+        if [size_128_bit, size_192_bit, size_256_bit].count(size_key) == 0:
+            raise ValueError
+    except ValueError:
+        logging.warning("Select the correct key size!")
+    except Exception as error:
+        logging.warning(error)
+
+
+def choose_mode(
+        path_to_symmetric_key: str,
+        path_to_public_key: str,
+        path_to_private_key: str,
+        path_to_text: str,
+        path_to_encrypted_text: str,
+        path_to_decrypted_text: str,
+        iv: bytes,
+        size_key: int,
+        work_modes: str):
+    for mode in work_modes:
+        try:
+            match mode:
+                case "1":
+                    generation_keys(path_to_symmetric_key, path_to_public_key, path_to_private_key, size_key)
+                    logging.info("The keys have been generated successfully!")
+
+                case "2":
+                    data_encrypt(path_to_text, path_to_private_key, path_to_symmetric_key, path_to_encrypted_text, iv)
+                    logging.info("The text has been successfully encrypted!")
+
+                case "3":
+                    data_decrypt(path_to_encrypted_text, path_to_private_key, path_to_symmetric_key, path_to_decrypted_text, iv)
+                    logging.info("The text has been successfully decrypted")
+
+                case _:
+                    raise ValueError
+
+
+        except Exception as error:
+            logging.warning(error)
 
 
 def decrypt_symmetric_key(private_key, encrypt_symmetric_key: bytes) -> bytes:
@@ -20,7 +68,7 @@ def decrypt_symmetric_key(private_key, encrypt_symmetric_key: bytes) -> bytes:
     return symmetric_key
 
 
-def get_cipher(symmetric_key: bytes):
+def get_cipher(symmetric_key: bytes, iv: bytes):
     cipher = Cipher(
         algorithms.AES(symmetric_key),
         modes.CBC(iv)
@@ -29,12 +77,12 @@ def get_cipher(symmetric_key: bytes):
     return cipher
 
 
-def generation_keys(path_to_serialize_symmetric_key: str, path_to_serialize_public_key: str, path_to_serialize_private_key: str):
-    key: bytes = os.urandom(16)
+def generation_keys(path_to_serialize_symmetric_key: str, path_to_serialize_public_key: str, path_to_serialize_private_key: str, size_key: int):
+    key: bytes = os.urandom(size_key)
 
     keys = rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048
+        public_exponent,
+        key_size
     )
 
     private_key = keys
@@ -55,43 +103,44 @@ def generation_keys(path_to_serialize_symmetric_key: str, path_to_serialize_publ
             label=None)
     )
 
-    serialize_symmetric_key(path_to_serialize_symmetric_key, encrypted_key)
+    write_to_file(path_to_serialize_symmetric_key, encrypted_key)
 
 
-def data_encrypt(path_to_text: str, path_to_private_key: str, path_to_symmetric_key: str, path_to_encrypted_text: str):
-    text: bytes = read_from_text_file(path_to_text)
+def data_encrypt(path_to_text: str, path_to_private_key: str, path_to_symmetric_key: str, path_to_encrypted_text: str, iv: bytes):
+    text: bytes = read_from_file(path_to_text)
     private_key = deserialize_private_key(path_to_private_key)
-    encrypt_symmetric_key: bytes = deserialize_symmetric_key(path_to_symmetric_key)
+    encrypt_symmetric_key: bytes = read_from_file(path_to_symmetric_key)
 
     symmetric_key = decrypt_symmetric_key(private_key, encrypt_symmetric_key)
 
-    padder = padding.ANSIX923(128).padder()
+    padder = padding.ANSIX923(size_128_bit).padder()
     padded_text = padder.update(text) + padder.finalize()
 
-    cipher = get_cipher(symmetric_key)
+    cipher = get_cipher(symmetric_key, iv)
 
     encryptor = cipher.encryptor()
     c_text = encryptor.update(padded_text) + encryptor.finalize()
 
-    write_encrypt_text_to_file(path_to_encrypted_text, c_text)
+    write_to_file(path_to_encrypted_text, c_text)
 
 
-def data_decrypt(path_to_encrypted_text: str, path_to_private_key: str, path_to_symmetric_key: str, path_to_decrypted_text: str):
-    encrypt_symmetric_key: bytes = deserialize_symmetric_key(path_to_symmetric_key)
-    encrypted_text: bytes = read_from_text_file(path_to_encrypted_text)
+
+def data_decrypt(path_to_encrypted_text: str, path_to_private_key: str, path_to_symmetric_key: str, path_to_decrypted_text: str, iv: bytes):
+    encrypt_symmetric_key: bytes = read_from_file(path_to_symmetric_key)
+    encrypted_text: bytes = read_from_file(path_to_encrypted_text)
     private_key = deserialize_private_key(path_to_private_key)
 
     symmetric_key = decrypt_symmetric_key(private_key, encrypt_symmetric_key)
 
-    cipher = get_cipher(symmetric_key)
+    cipher = get_cipher(symmetric_key, iv)
 
     decryptor = cipher.decryptor()
     dc_text = decryptor.update(encrypted_text) + decryptor.finalize()
 
-    unpadder = padding.ANSIX923(128).unpadder()
+    unpadder = padding.ANSIX923(size_128_bit).unpadder()
     unpadded_dc_text = unpadder.update(dc_text) + unpadder.finalize()
 
-    write_encrypt_text_to_file(path_to_decrypted_text, unpadded_dc_text)
+    write_to_file(path_to_decrypted_text, unpadded_dc_text)
 
 
 def start_work(path_to_symmetric_key: str,
@@ -99,7 +148,20 @@ def start_work(path_to_symmetric_key: str,
                path_to_private_key: str,
                path_to_text: str,
                path_to_encrypted_text: str,
-               path_to_decrypted_text: str):
-    generation_keys(path_to_symmetric_key, path_to_public_key, path_to_private_key)
-    data_encrypt(path_to_text, path_to_private_key, path_to_symmetric_key, path_to_encrypted_text)
-    data_decrypt(path_to_encrypted_text, path_to_private_key, path_to_symmetric_key, path_to_decrypted_text)
+               path_to_decrypted_text: str,
+               size_key: int,
+               work_mode: str):
+    iv = os.urandom(size_128_bit // byte_size)
+    check_key_length(size_key)
+    size_key_bytes = size_key // byte_size
+    choose_mode(
+        path_to_symmetric_key,
+        path_to_public_key,
+        path_to_private_key,
+        path_to_text,
+        path_to_encrypted_text,
+        path_to_decrypted_text,
+        iv,
+        size_key_bytes,
+        work_mode,
+    )
