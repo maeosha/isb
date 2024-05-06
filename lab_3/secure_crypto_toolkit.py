@@ -9,8 +9,28 @@ from file_work import *
 
 iv = os.urandom(16)
 
+
+def decrypt_symmetric_key(private_key, encrypt_symmetric_key: bytes) -> bytes:
+    symmetric_key = private_key.decrypt(encrypt_symmetric_key,
+                                            asymmetric_padding.OAEP(mgf=asymmetric_padding.MGF1(algorithm=hashes.SHA256()),
+                                                algorithm=hashes.SHA256(),label=None
+                                            )
+                                        )
+
+    return symmetric_key
+
+
+def get_cipher(symmetric_key: bytes):
+    cipher = Cipher(
+        algorithms.AES(symmetric_key),
+        modes.CBC(iv)
+    )
+
+    return cipher
+
+
 def generation_keys(path_to_serialize_symmetric_key: str, path_to_serialize_public_key: str, path_to_serialize_private_key: str):
-    key: bytes = b"1" * 16
+    key: bytes = os.urandom(16)
 
     keys = rsa.generate_private_key(
         public_exponent=65537,
@@ -43,20 +63,13 @@ def data_encrypt(path_to_text: str, path_to_private_key: str, path_to_symmetric_
     private_key = deserialize_private_key(path_to_private_key)
     encrypt_symmetric_key: bytes = deserialize_symmetric_key(path_to_symmetric_key)
 
-    symmetric_key = private_key.decrypt(encrypt_symmetric_key,
-                                            asymmetric_padding.OAEP(mgf=asymmetric_padding.MGF1(algorithm=hashes.SHA256()),
-                                                algorithm=hashes.SHA256(),label=None
-                                            )
-                                        )
+    symmetric_key = decrypt_symmetric_key(private_key, encrypt_symmetric_key)
 
     padder = padding.ANSIX923(128).padder()
     padded_text = padder.update(text) + padder.finalize()
 
+    cipher = get_cipher(symmetric_key)
 
-    cipher = Cipher(
-        algorithms.AES(symmetric_key),
-        modes.CBC(iv)
-    )
     encryptor = cipher.encryptor()
     c_text = encryptor.update(padded_text) + encryptor.finalize()
 
@@ -68,28 +81,25 @@ def data_decrypt(path_to_encrypted_text: str, path_to_private_key: str, path_to_
     encrypted_text: bytes = read_from_text_file(path_to_encrypted_text)
     private_key = deserialize_private_key(path_to_private_key)
 
-    symmetric_key = private_key.decrypt(encrypt_symmetric_key,
-                                            asymmetric_padding.OAEP(mgf=asymmetric_padding.MGF1(algorithm=hashes.SHA256()),
-                                                algorithm=hashes.SHA256(),label=None
-                                            )
-                                        )
+    symmetric_key = decrypt_symmetric_key(private_key, encrypt_symmetric_key)
 
-    cipher = Cipher(
-        algorithms.AES(symmetric_key),
-        modes.CBC(iv)
-    )
+    cipher = get_cipher(symmetric_key)
 
     decryptor = cipher.decryptor()
-
     dc_text = decryptor.update(encrypted_text) + decryptor.finalize()
 
     unpadder = padding.ANSIX923(128).unpadder()
     unpadded_dc_text = unpadder.update(dc_text) + unpadder.finalize()
 
-    print(unpadded_dc_text.decode("utf-8"))
-
     write_encrypt_text_to_file(path_to_decrypted_text, unpadded_dc_text)
 
-generation_keys("symmetric_key.txt", "public.pem", "private.pem")
-data_encrypt("text.txt", "private.pem", "symmetric_key.txt", "encrypted_text.txt")
-data_decrypt("encrypted_text.txt", "private.pem", "symmetric_key.txt", "decrypted_text.txt")
+
+def start_work(path_to_symmetric_key: str,
+               path_to_public_key: str,
+               path_to_private_key: str,
+               path_to_text: str,
+               path_to_encrypted_text: str,
+               path_to_decrypted_text: str):
+    generation_keys(path_to_symmetric_key, path_to_public_key, path_to_private_key)
+    data_encrypt(path_to_text, path_to_private_key, path_to_symmetric_key, path_to_encrypted_text)
+    data_decrypt(path_to_encrypted_text, path_to_private_key, path_to_symmetric_key, path_to_decrypted_text)

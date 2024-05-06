@@ -4,15 +4,30 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 
-def serialize_symmetric_key(path_to_serialize_symmetric_key: str, key: bytes):
+def write_to_file(path_to_file: str, content: bytes):
     try:
-        with open(path_to_serialize_symmetric_key, 'wb') as key_file:
-            key_file.write(key)
+        with open(path_to_file, 'wb') as file:
+            file.write(content)
     except OSError as error:
         logging.warning(error)
 
     except Exception as error:
         logging.warning(error)
+
+
+def read_from_file(path_to_file: str) -> bytes:
+    try:
+        with open(path_to_file, "rb") as file:
+            content = file.read()
+
+    except OSError as error:
+        logging.warning(error)
+
+    except Exception as error:
+        logging.warning(error)
+
+    return content
+
 
 def serialize_asymmetric_key(path_to_serialize_public_key: str, path_to_serialize_private_key: str, public_key, private_key):
     try:
@@ -36,20 +51,6 @@ def serialize_asymmetric_key(path_to_serialize_public_key: str, path_to_serializ
         logging.warning(error)
 
 
-def read_from_text_file(path_to_file: str) -> bytes:
-    try:
-        with open(path_to_file, "rb") as text_file:
-            text = text_file.read()
-
-    except OSError as error:
-        logging.warning(error)
-
-    except Exception as error:
-        logging.warning(error)
-
-    return text
-
-
 def deserialize_private_key(path_to_private):
     try:
         with open(path_to_private, 'rb') as pem_in:
@@ -63,30 +64,4 @@ def deserialize_private_key(path_to_private):
         logging.warning(error)
 
     return d_private_key
-
-
-def deserialize_symmetric_key(path_to_symmetric_key) -> bytes:
-    try:
-        with open(path_to_symmetric_key, "rb") as key_file:
-            key = key_file.read()
-
-    except OSError as error:
-        logging.warning(error)
-
-    except Exception as error:
-        logging.warning(error)
-
-    return key
-
-
-def write_encrypt_text_to_file(path_to_file: str, encrypted_text):
-    try:
-        with open(path_to_file, 'wb') as text_file:
-            text_file.write(encrypted_text)
-
-    except OSError as error:
-        logging.warning(error)
-
-    except Exception as error:
-        logging.warning(error)
 
