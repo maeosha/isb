@@ -14,8 +14,15 @@ byte_size = 8
 public_exponent=65537
 key_size=2048
 
+logging.basicConfig(level=logging.INFO)
 
-def check_key_length(size_key: int):
+
+def check_key_length(size_key: int) -> None:
+    """
+    checking the received key for belonging to 128, 192, 256 bit size
+    :param size_key:
+    :return:
+    """
     try:
         if [size_128_bit, size_192_bit, size_256_bit].count(size_key) == 0:
             raise ValueError
@@ -34,7 +41,20 @@ def choose_mode(
         path_to_decrypted_text: str,
         iv: bytes,
         size_key: int,
-        work_modes: str):
+        work_modes: str) -> None:
+    """
+    selecting the operating mode
+    :param path_to_symmetric_key:
+    :param path_to_public_key:
+    :param path_to_private_key:
+    :param path_to_text:
+    :param path_to_encrypted_text:
+    :param path_to_decrypted_text:
+    :param iv:
+    :param size_key:
+    :param work_modes:
+    :return:
+    """
     for mode in work_modes:
         try:
             match mode:
@@ -59,6 +79,12 @@ def choose_mode(
 
 
 def decrypt_symmetric_key(private_key, encrypt_symmetric_key: bytes) -> bytes:
+    """
+    symmetric key encryption with an asymmetric algorithm
+    :param private_key:
+    :param encrypt_symmetric_key:
+    :return symmetric_key:
+    """
     symmetric_key = private_key.decrypt(encrypt_symmetric_key,
                                             asymmetric_padding.OAEP(mgf=asymmetric_padding.MGF1(algorithm=hashes.SHA256()),
                                                 algorithm=hashes.SHA256(),label=None
@@ -69,6 +95,12 @@ def decrypt_symmetric_key(private_key, encrypt_symmetric_key: bytes) -> bytes:
 
 
 def get_cipher(symmetric_key: bytes, iv: bytes):
+    """
+    getting the encryption method
+    :param symmetric_key:
+    :param iv:
+    :return cipher:
+    """
     cipher = Cipher(
         algorithms.AES(symmetric_key),
         modes.CBC(iv)
@@ -78,6 +110,14 @@ def get_cipher(symmetric_key: bytes, iv: bytes):
 
 
 def generation_keys(path_to_serialize_symmetric_key: str, path_to_serialize_public_key: str, path_to_serialize_private_key: str, size_key: int):
+    """
+    generation and serialization of symmetric and asymmetric keys
+    :param path_to_serialize_symmetric_key:
+    :param path_to_serialize_public_key:
+    :param path_to_serialize_private_key:
+    :param size_key:
+    :return:
+    """
     key: bytes = os.urandom(size_key)
 
     keys = rsa.generate_private_key(
@@ -107,6 +147,15 @@ def generation_keys(path_to_serialize_symmetric_key: str, path_to_serialize_publ
 
 
 def data_encrypt(path_to_text: str, path_to_private_key: str, path_to_symmetric_key: str, path_to_encrypted_text: str, iv: bytes):
+    """
+    encryption of text using a symmetric algorithm
+    :param path_to_text:
+    :param path_to_private_key:
+    :param path_to_symmetric_key:
+    :param path_to_encrypted_text:
+    :param iv:
+    :return:
+    """
     text: bytes = read_from_file(path_to_text)
     private_key = deserialize_private_key(path_to_private_key)
     encrypt_symmetric_key: bytes = read_from_file(path_to_symmetric_key)
@@ -126,6 +175,15 @@ def data_encrypt(path_to_text: str, path_to_private_key: str, path_to_symmetric_
 
 
 def data_decrypt(path_to_encrypted_text: str, path_to_private_key: str, path_to_symmetric_key: str, path_to_decrypted_text: str, iv: bytes):
+    """
+    decryption of text using a symmetric algorithm
+    :param path_to_encrypted_text:
+    :param path_to_private_key:
+    :param path_to_symmetric_key:
+    :param path_to_decrypted_text:
+    :param iv:
+    :return:
+    """
     encrypt_symmetric_key: bytes = read_from_file(path_to_symmetric_key)
     encrypted_text: bytes = read_from_file(path_to_encrypted_text)
     private_key = deserialize_private_key(path_to_private_key)

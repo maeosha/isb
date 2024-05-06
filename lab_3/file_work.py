@@ -5,6 +5,12 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 
 def write_to_file(path_to_file: str, content: bytes):
+    """
+    recording content by path to file
+    :param path_to_file:
+    :param content:
+    :return:
+    """
     try:
         with open(path_to_file, 'wb') as file:
             file.write(content)
@@ -16,6 +22,11 @@ def write_to_file(path_to_file: str, content: bytes):
 
 
 def read_from_file(path_to_file: str) -> bytes:
+    """
+    reading content from path to file
+    :param path_to_file:
+    :return content:
+    """
     try:
         with open(path_to_file, "rb") as file:
             content = file.read()
@@ -30,6 +41,14 @@ def read_from_file(path_to_file: str) -> bytes:
 
 
 def serialize_asymmetric_key(path_to_serialize_public_key: str, path_to_serialize_private_key: str, public_key, private_key):
+    """
+    serializing the public and private key along the path
+    :param path_to_serialize_public_key:
+    :param path_to_serialize_private_key:
+    :param public_key:
+    :param private_key:
+    :return:
+    """
     try:
         with open(path_to_serialize_public_key, 'wb') as key_file:
             key_file.write(public_key.public_bytes(
@@ -52,6 +71,11 @@ def serialize_asymmetric_key(path_to_serialize_public_key: str, path_to_serializ
 
 
 def deserialize_private_key(path_to_private):
+    """
+    deserializing the private key along the path
+    :param path_to_private:
+    :return d_private_key:
+    """
     try:
         with open(path_to_private, 'rb') as pem_in:
             private_key: bytes = pem_in.read()
