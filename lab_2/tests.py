@@ -3,10 +3,7 @@ import mpmath
 
 from file_work import read_sequence_from_file, write_stats_to_file
 
-PI_0: float = 0.2148
-PI_1: float = 0.3672
-PI_2: float = 0.2305
-PI_3: float = 0.1875
+PI: list = [0.2148, 0.3672, 0.2305, 0.1875]
 
 len_mini_sequence: int = 8
 
@@ -14,8 +11,8 @@ len_mini_sequence: int = 8
 def frequency_bitwise_test(sequences: dict, path_to_file: str) -> None:
     """
     Obtaining the probability of randomness of the obtained sequence using a frequency bit test.
-    :param sequences: 
-    :param path_to_file: 
+    :param sequences: random sequences from java and c++
+    :param path_to_file: path to write statistics
     :return: 
     """
     for sequence in sequences.items():
@@ -39,8 +36,8 @@ def frequency_bitwise_test(sequences: dict, path_to_file: str) -> None:
 def test_for_same_bits(sequences: dict, path_to_file: str) -> None:
     """
     Obtaining the probability of randomness of the obtained sequence using a same bits test.
-    :param sequences:
-    :param path_to_file:
+    :param sequences: random sequences from java and c++
+    :param path_to_file: path to write statistics
     :return:
     """
     for sequence in sequences.items():
@@ -74,9 +71,9 @@ def test_for_same_bits(sequences: dict, path_to_file: str) -> None:
 def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: int) -> None:
     """
     Obtaining the probability of randomness of the obtained sequence using an ones sequence test.
-    :param sequences:
-    :param path_to_file:
-    :param len_mini_sequence:
+    :param sequences: random sequences from java and c++
+    :param path_to_file: path to write statistics
+    :param len_mini_sequence: The length of the blocks into which the sequence will be split
     :return:
     """
     for sequence in sequences.items():
@@ -85,13 +82,13 @@ def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: in
         P: float = 0
         xi_sqrt: float = 0
         stats: dict = dict()
-        probabilities_pi: dict = {PI_0: 0, PI_1: 0, PI_2: 0, PI_3: 0}
+        mini_sequence_count: list = [0, 0, 0, 0]
 
-        for i_index in range(0, len(sequence_value), 8):
+        for i_index in range(0, len(sequence_value), len_mini_sequence):
             ones_count: int = 0
             max_ones_count = -1
 
-            for j_index in range(i_index, i_index + 8):
+            for j_index in range(i_index, i_index + len_mini_sequence):
                 if sequence_value[j_index] == "0":
                     ones_count = 0
                 else:
@@ -101,20 +98,20 @@ def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: in
 
             match max_ones_count:
                 case 0 | 1:
-                    probabilities_pi[PI_0] += 1
+                    mini_sequence_count[0] += 1
 
                 case 2:
-                    probabilities_pi[PI_1] += 1
+                    mini_sequence_count[1] += 1
 
                 case 3:
-                    probabilities_pi[PI_2] += 1
+                    mini_sequence_count[2] += 1
 
                 case _:
-                    probabilities_pi[PI_3] += 1
+                    mini_sequence_count[3] += 1
 
-        for PI in probabilities_pi.keys():
-            numerator: float = math.pow(probabilities_pi[PI] - 16 * PI, 2)
-            denominator: float = 16 * PI
+        for value in zip(PI, mini_sequence_count):
+            numerator: float = math.pow(value[1] - 16 * value[0], 2)
+            denominator: float = 16 * value[0]
             xi_sqrt += (numerator / denominator)
 
         P = mpmath.gammainc(1.5, xi_sqrt / 2)
@@ -126,8 +123,8 @@ def ones_sequence_test(sequences: dict, path_to_file: str, len_mini_sequence: in
 def start_work(path_to_sequence_file: str, path_to_stats_file: str) -> None:
     """
     Getting started with the program, the resulting paths are used for subsequent functions.
-    :param path_to_sequence_file: 
-    :param path_to_stats_file: 
+    :param path_to_sequence_file: path to read random sequence
+    :param path_to_stats_file: path to write statistics
     :return: 
     """""
     sequences: dict = read_sequence_from_file(path_to_sequence_file)
