@@ -8,6 +8,8 @@ from tqdm import trange
 
 from file_work import *
 
+logging.basicConfig(level=logging.INFO)
+
 LEN_INS_ELEM: int = 6  # Length of the part of the card number to be inserted between BIN and last 4 digits
 CHECK_INTERVAL: int = 1000  # Interval to check if the stop event is set
 MAX_ITERATORS: int = 10000000  # Maximum number of iterations for generating card numbers
