@@ -71,3 +71,44 @@ def find_card_num_with_mp(card_bins: list, last_4_digit: str, card_hash: str, nu
                 pool.terminate()
                 break
 
+
+def check_correctness_card_num(card_num: str) -> None:
+    """
+    Checks the correctness of a card number using the Luhn algorithm.
+
+    :param card_num: Card number as a string.
+    :return: None
+    """
+    res, correct_num = lunas_algorithm(card_num)
+    logging.info(f"Your card number: {card_num}")
+    logging.info(f"The control number calculated for this number: {correct_num}")
+    if res:
+        logging.info("The control numbers match, the card number is correct!")
+    else:
+        logging.info("The control numbers do not match, the card number is incorrect!")
+
+
+def lunas_algorithm(card_num: str):
+    """
+    Implements the Luhn algorithm to check the correctness of a card number.
+
+    :param card_num: Card number as a string.
+    :return: Tuple (bool, int), where bool indicates if the card number is correct,
+             and int is the calculated control number.
+    """
+    control_num = int(card_num[-1])
+    card_num = card_num[:-1]
+    reverse_card_num: str = card_num[::-1]
+    checksum: int = 0
+
+    for index, digit in enumerate(reverse_card_num):
+        if index % 2 == 0:
+            digit = str(int(digit) * 2)
+        checksum += sum(map(int, digit))
+    checksum = (10 - (checksum % 10)) % 10
+
+    if checksum == control_num:
+        return True, checksum
+    return False, checksum
+
+
