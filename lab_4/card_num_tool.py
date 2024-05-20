@@ -1,13 +1,15 @@
 import hashlib
 import multiprocessing as mp
+import time
 
+from matplotlib import pyplot as plt
 from tqdm import trange
+
 from file_work import *
 
 len_ins_elem = 6
 check_interval: int = 1000 #
 max_iterators = 10000000
-
 
 
 def hash_matches(card_bin: str, last_4_digits: str, card_hash: str, i:int):
@@ -112,3 +114,42 @@ def lunas_algorithm(card_num: str):
     return False, checksum
 
 
+def time_collision_search():
+    time_list: list = list()
+    number_of_process_list: list = list()
+    for number_of_processes in range(1, int(mp.cpu_count() * 1.5)):
+        start_time = time.time()
+        find_card_num_with_mp(number_of_processes)
+        end_time = time.time()
+
+        time_list.append(end_time - start_time)
+        number_of_process_list.append(number_of_processes)
+    generate_graph(number_of_process_list, time_list)
+
+
+def generate_graph(x: list, y: list) -> None:
+    """
+    Generate a graph to visualize execution time vs. number of processes.
+
+    :param x: List of number of processes.
+    :param y: List of execution times.
+    """
+    fig, ax = plt.subplots()
+
+    ax.plot(x, y, color="blue", marker='o', linestyle='-')
+
+    y_min = min(y)
+    x_min = y.index(y_min) + 1
+    ax.scatter(x_min, y_min, color="red", label="minimum execution time", zorder=5)
+
+    ax.set_xlabel("Number of processes")
+    ax.set_ylabel("Execution time (s)")
+    ax.set_title("Execution Time vs. Number of Processes")
+
+    ax.set_xticks(x)
+    ax.grid(True)
+
+    ax.legend()
+
+    plt.tight_layout()
+    plt.show()
