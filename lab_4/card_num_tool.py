@@ -6,7 +6,7 @@ import logging
 from matplotlib import pyplot as plt
 from tqdm import trange
 
-from file_work import *
+from file_work import write_card_num_to_file, read_config_file
 
 logging.basicConfig(level=logging.INFO)
 
@@ -196,7 +196,7 @@ def generate_graph(x: list, y: list) -> None:
         logging.exception("An error occurred while generating the graph.", exc_info=error)
 
 
-def mode_choice(mode: int, card_bins: list, last_4_digit: str, card_hash: str, card_num: str, path_to_file: str):
+def mode_choice(mode: int, path_to_file: str, card_bins: list, last_4_digit: str, card_hash: str, card_num: str):
     """
     Selects and executes the appropriate mode of operation based on user input.
 
@@ -227,3 +227,20 @@ def mode_choice(mode: int, card_bins: list, last_4_digit: str, card_hash: str, c
 
     except Exception as error:
         logging.exception("An unexpected error occurred during mode execution.", exc_info=error)
+
+
+def start_work(mode: int, path_to_config_file: str, path_to_file: str):
+    """
+    Starts the card number processing work based on the selected mode.
+
+    :param mode: Mode of operation (1, 2, or 3).
+    :param path_to_config_file: Path to the configuration file.
+    :param path_to_file: Path to the file to write the found card number (used in mode 1).
+    """
+    config: dict = read_config_file(path_to_config_file)
+    mode_choice(mode, path_to_file,
+                config['card_bins'],
+                config['last_4_digits'],
+                config['card_hash'],
+                config['card_number'])
+
