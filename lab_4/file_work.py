@@ -9,9 +9,6 @@ def write_card_num_to_file(card_num: str, path_to_file: str):
     :param card_num: The card number to write to the file.
     :param path_to_file: The path to the file where the card number will be written.
     """
-    if path_to_file == "":
-        return
-
     try:
         with open(path_to_file, 'w') as file:
             file.write(card_num)
